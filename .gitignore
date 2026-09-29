@@ -1,3 +1,4 @@
 .build/
 Plume.app/
 .DS_Store
+Plume-*.zip
