@@ -65,7 +65,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 item("Print…", #selector(MarkdownDocument.printDocument(_:)), "p"),
             ]),
             submenu("Edit", [
+                item("Undo", Selector(("undo:")), "z"),
+                item("Redo", Selector(("redo:")), "z", [.command, .shift]),
+                .separator(),
+                item("Cut", #selector(NSText.cut(_:)), "x"),
                 item("Copy", #selector(NSText.copy(_:)), "c"),
+                item("Paste", #selector(NSText.paste(_:)), "v"),
                 item("Select All", #selector(NSText.selectAll(_:)), "a"),
                 .separator(),
                 item("Find…", #selector(MarkdownDocument.showFind(_:)), "f"),
