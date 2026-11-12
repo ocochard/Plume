@@ -67,8 +67,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             submenu("Edit", [
                 item("Copy", #selector(NSText.copy(_:)), "c"),
                 item("Select All", #selector(NSText.selectAll(_:)), "a"),
+                .separator(),
+                item("Find…", #selector(MarkdownDocument.showFind(_:)), "f"),
+                item("Find Next", #selector(MarkdownDocument.findNext(_:)), "g"),
+                item("Find Previous", #selector(MarkdownDocument.findPrevious(_:)), "g", [.command, .shift]),
             ]),
             submenu("View", [
+                item("Toggle Sidebar", #selector(MarkdownDocument.toggleOutline(_:)), "s", [.command, .control]),
+                .separator(),
                 item("Zoom In", #selector(MarkdownDocument.zoomIn(_:)), "+"),
                 item("Zoom Out", #selector(MarkdownDocument.zoomOut(_:)), "-"),
                 item("Actual Size", #selector(MarkdownDocument.zoomReset(_:)), "0"),

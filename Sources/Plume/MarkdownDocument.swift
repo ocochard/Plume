@@ -2,7 +2,7 @@ import AppKit
 import WebKit
 
 @objc(MarkdownDocument)
-final class MarkdownDocument: NSDocument, WKNavigationDelegate {
+final class MarkdownDocument: NSDocument, WKNavigationDelegate, NSSearchFieldDelegate {
     private let webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
     private var markdown = ""
     private var loaded = false
@@ -28,6 +28,7 @@ final class MarkdownDocument: NSDocument, WKNavigationDelegate {
                            styleMask: [.titled, .closable, .miniaturizable, .resizable],
                            backing: .buffered, defer: false)
         win.contentView = webView
+        installFindBar(in: win)
         win.center()
         addWindowController(NSWindowController(window: win))
     }
@@ -92,6 +93,58 @@ final class MarkdownDocument: NSDocument, WKNavigationDelegate {
     }
 
     private func restoreTheme() { webView.appearance = nil }
+
+    // MARK: Find
+
+    private let findField = NSSearchField()
+    private let findBar = NSTitlebarAccessoryViewController()
+
+    private func installFindBar(in win: NSWindow) {
+        let box = NSView(frame: NSRect(x: 0, y: 0, width: 400, height: 36))
+        findField.frame = NSRect(x: 12, y: 6, width: 376, height: 24)
+        findField.autoresizingMask = [.width]
+        findField.placeholderString = "Find"
+        findField.delegate = self
+        findField.target = self
+        findField.action = #selector(findNext(_:))
+        box.addSubview(findField)
+        findBar.view = box
+        findBar.layoutAttribute = .bottom
+        findBar.isHidden = true
+        win.addTitlebarAccessoryViewController(findBar)
+    }
+
+    @objc func showFind(_ sender: Any?) {
+        findBar.isHidden = false
+        window?.makeFirstResponder(findField)
+        findField.selectText(nil)
+    }
+
+    @objc func findNext(_ sender: Any?) { find(backwards: false) }
+    @objc func findPrevious(_ sender: Any?) { find(backwards: true) }
+
+    private func find(backwards: Bool) {
+        if findBar.isHidden { return showFind(nil) }
+        let text = findField.stringValue
+        guard !text.isEmpty else { return }
+        let config = WKFindConfiguration()
+        config.backwards = backwards
+        config.wraps = true
+        webView.find(text, configuration: config) { _ in }
+    }
+
+    func control(_ control: NSControl, textView: NSTextView, doCommandBy sel: Selector) -> Bool {
+        guard sel == #selector(NSResponder.cancelOperation(_:)) else { return false }
+        findBar.isHidden = true
+        window?.makeFirstResponder(webView)
+        return true
+    }
+
+    // MARK: Sidebar
+
+    @objc func toggleOutline(_ sender: Any?) {
+        webView.callAsyncJavaScript("toggleToc()", arguments: [:], in: nil, in: .page) { _ in }
+    }
 
     // MARK: Zoom
 

@@ -1,6 +1,6 @@
 html { color-scheme: light dark; background: Canvas; }
 body { margin: 0; }
-.markdown-body { box-sizing: border-box; max-width: 980px; margin: 0 auto; padding: 32px 45px; background: transparent !important; }
+.markdown-body { box-sizing: border-box; max-width: none; margin: 0; padding: 32px 45px; background: transparent !important; }
 .mermaid { text-align: center; margin: 16px 0; }
 svg { max-width: 100%; height: auto; }
 @media print {
@@ -8,3 +8,18 @@ svg { max-width: 100%; height: auto; }
   pre, .mermaid, table, img, blockquote { break-inside: avoid; }
   h1, h2, h3, h4 { break-after: avoid; }
 }
+
+#toc { display: none; position: sticky; top: 0; align-self: flex-start; flex: none; height: 100vh; overflow: auto;
+  width: max-content; min-width: 120px; max-width: 320px; box-sizing: border-box;
+  padding: 16px 16px 16px 12px; font: 13px -apple-system, system-ui, sans-serif; background: Canvas; color: CanvasText;
+  }
+#toc-resizer { display: none; position: sticky; top: 0; align-self: flex-start; flex: none; width: 6px; height: 100vh;
+  cursor: col-resize; box-shadow: inset -1px 0 rgba(128,128,128,.3); }
+#toc-resizer:hover, #toc-resizer.drag { box-shadow: inset -2px 0 rgba(128,128,128,.6); }
+#toc a { display: block; padding: 3px 0; color: inherit; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#toc a:hover { color: LinkText; }
+body.toc { display: flex; }
+body.toc #toc { display: block; }
+body.toc #toc-resizer { display: block; }
+body.toc .markdown-body { flex: 1; min-width: 0; margin: 0; }
+@media print { #toc, #toc-resizer { display: none !important; } body.toc { display: block; } }

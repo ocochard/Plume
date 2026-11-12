@@ -31,6 +31,16 @@ async function doRender(md, base, g) {
     h.id = seen[s] ? `${s}-${seen[s]++}` : (seen[s] = 1, s);
   });
 
+  const toc = document.getElementById('toc');
+  toc.replaceChildren(...[...el.querySelectorAll('h1,h2,h3,h4,h5,h6')].map(h => {
+    const a = document.createElement('a');
+    a.href = '#' + encodeURIComponent(h.id);
+    a.textContent = h.textContent;
+    a.title = h.textContent;
+    a.style.paddingLeft = (h.tagName[1] - 1) * 12 + 'px';
+    return a;
+  }));
+
   const nodes = [];
   el.querySelectorAll('pre > code.language-mermaid').forEach(c => {
     const d = document.createElement('div');
@@ -45,6 +55,29 @@ async function doRender(md, base, g) {
   }
   if (g === gen) scrollTo(0, y);
 }
+
+addEventListener('DOMContentLoaded', () => {
+  const bar = document.getElementById('toc-resizer'), toc = document.getElementById('toc');
+  const move = e => {
+    toc.style.maxWidth = 'none';
+    toc.style.width = Math.max(120, Math.min(e.clientX, innerWidth / 2)) + 'px';
+  };
+  const up = () => {
+    bar.classList.remove('drag');
+    document.body.style.userSelect = '';
+    removeEventListener('mousemove', move);
+    removeEventListener('mouseup', up);
+  };
+  bar.addEventListener('mousedown', e => {
+    e.preventDefault();
+    bar.classList.add('drag');
+    document.body.style.userSelect = 'none';
+    addEventListener('mousemove', move);
+    addEventListener('mouseup', up);
+  });
+});
+
+function toggleToc() { document.body.classList.toggle('toc'); }
 
 // Resolve once the page follows the wanted scheme and the resulting re-render is done.
 async function settle(dark) {
